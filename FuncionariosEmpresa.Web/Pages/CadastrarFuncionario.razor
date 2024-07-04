@@ -1,0 +1,84 @@
+﻿@page "/CadastrarFuncionario"
+@inject FuncionariosApi funcionariosApi
+@inject NavigationManager navigationManager
+
+<MudPaper Class="px-8 pt-2 pb-4 mx-12 my-8" Justify="Justify.Center">
+
+    <MudText Class="mt-8" Typo="Typo.h4">Cadastro de Funcionário</MudText>
+
+    <MudForm>
+
+        <MudTextField Class="mt-4" T="string" Placeholder="Nome"
+                      Variant="Variant.Outlined"
+                      @bind-Value="nome"
+                      Required="true"
+                      RequiredError="Campo obrigatório."
+                      MaxLength="40" />
+
+        <MudTextField Class="mt-4" T="string" Placeholder="Cpf"
+                      Variant="Variant.Outlined"
+                      @bind-Value="cpf"
+                      Required="true"
+                      RequiredError="Campo obrigatório."
+                      MaxLength="11" />
+
+        <MudTextField Class="mt-4" T="string" Placeholder="Email"
+                      Variant="Variant.Outlined"
+                      @bind-Value="email"
+                      Required="true"
+                      RequiredError="Campo obrigatório."
+                      MaxLength="50" />
+
+        <MudTextField Class="mt-4" T="string" Placeholder="Celular"
+                      Variant="Variant.Outlined"
+                      @bind-Value="celular"
+                      Required="true"
+                      RequiredError="Campo obrigatório."
+                      MaxLength="13" />
+
+        <div class="d-flex align-center justify-space-between mt-4">
+            <MudButton Variant="Variant.Filled"
+                       @onclick="Cadastrar"
+                       Color="Color.Primary"
+                       Class="ml-auto">
+                Cadastrar
+            </MudButton>
+        </div>
+
+    </MudForm>
+</MudPaper>
+
+@if (showAlert)
+{
+    <MudAlert Severity="Severity.Error">
+        Todos os campos devem ser preenchido.
+    </MudAlert>
+}
+
+
+@code {
+    private string? nome;
+    private string? cpf;
+    private string? email;
+    private string? celular;
+
+    private bool showAlert;
+
+    private async Task Cadastrar()
+    {
+        if (string.IsNullOrEmpty(cpf) || string.IsNullOrEmpty(nome) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(celular))
+        {
+            showAlert = true;
+        }
+
+        else
+        {
+            showAlert = false;
+
+            var request = new AdicionaFuncionarioDto(nome!, cpf!, email!, celular!);
+            await funcionariosApi.AddFuncionarioAsync(request);
+            navigationManager.NavigateTo("/Funcionarios");
+        }
+    }
+
+}

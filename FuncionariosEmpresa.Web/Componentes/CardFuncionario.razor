@@ -1,0 +1,23 @@
+﻿<MudCard>
+    <MudCardMedia Image="images/Perfil.png" Style="width: 80px; height: 80px;"></MudCardMedia>
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">@Funcionario!.Nome</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudText Typo="Typo.body2">@Funcionario!.Cpf</MudText>
+    </MudCardContent>
+    <MudCardActions>
+        <MudButton Color="Color.Warning"
+                   Variant="Variant.Outlined"
+                   Href=@($"/EditarFuncionario/{Funcionario!.Cpf}")>Detalhes</MudButton>
+    </MudCardActions>
+</MudCard>
+
+
+@code {
+    [Parameter]
+    public ExibeFuncionarioDto? Funcionario { get; set; }
+}
+

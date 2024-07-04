@@ -1,0 +1,126 @@
+﻿@page "/EditarFuncionario/{Cpf}"
+@inject FuncionariosApi funcionariosApi
+@inject NavigationManager navigationManager
+
+<MudPaper Class="px-8 pt-2 pb-4 mx-12 my-8" Justify="Justify.Center">
+
+    <MudText Class="mt-8" Typo="Typo.h4">Edição de Funcionário</MudText>
+
+    <MudForm>
+
+        <MudTextField Class="mt-4" T="string" Placeholder="Nome do Funcionário"
+                      Variant="Variant.Outlined"
+                      @bind-Value="nome"
+                      Required="true"
+                      RequiredError="Campo obrigatório." />
+
+        <MudTextField Class="mt-4" T="string" Placeholder="cpf do funcionário"
+                      Variant="Variant.Outlined"
+                      @bind-Value="cpf"
+                      Required="true"
+                      RequiredError="Campo obrigatório." />
+
+        <MudTextField Class="mt-4" T="string" Placeholder="email do funcionário"
+                      Variant="Variant.Outlined"
+                      @bind-Value="email"
+                      Required="true"
+                      RequiredError="Campo obrigatório." />
+
+        <MudTextField Class="mt-4" T="string" Placeholder="celular do funcionário"
+                      Variant="Variant.Outlined"
+                      @bind-Value="celular"
+                      Required="true"
+                      RequiredError="Campo obrigatório." />
+
+        <div class="d-flex align-center justify-space-between mt-4">
+            <MudButton Variant="Variant.Filled"
+                       @onclick="Voltar"
+                       Color="Color.Info"
+                       Class="ml-auto">
+                Voltar
+            </MudButton>
+
+            <MudButton Variant="Variant.Filled"
+                       @onclick="Atualizar"
+                       Color="Color.Primary"
+                       Class="ml-2">
+                Salvar
+            </MudButton>
+
+            <MudButton Variant="Variant.Filled"
+                       @onclick="Deletar"
+                       Color="Color.Secondary"
+                       Class="ml-2">
+                Deletar
+            </MudButton>
+        </div>
+
+    </MudForm>
+</MudPaper>
+
+@if (showAlert)
+{
+    <MudAlert Severity="Severity.Error">
+        Todos os campos devem ser preenchido.
+    </MudAlert>
+}
+
+
+@code {
+    private string? nome;
+    private string? cpf;
+    private string? email;
+    private string? celular;
+
+    private bool showAlert;
+
+    [Parameter]
+    public string? Cpf { get; set; }
+
+    public ExibeFuncionarioDto? Funcionario { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Funcionario = await funcionariosApi.GetFuncionarioPorCpfAsync(Cpf!);
+        nome = Funcionario!.Nome;
+        cpf = Funcionario!.Cpf;
+        email = Funcionario!.Email;
+        celular = Funcionario!.NumeroCelular;
+    }
+
+    private async Task Deletar()
+    {
+        await funcionariosApi.DeleteArtistaAsync(Cpf!);
+        navigationManager.NavigateTo("/Funcionarios");
+    }
+
+    private void Voltar()
+    {
+        navigationManager.NavigateTo("/Funcionarios");
+    }
+
+    private async Task Atualizar()
+    {
+        if (string.IsNullOrEmpty(cpf) || string.IsNullOrEmpty(nome) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(celular))
+        {
+            showAlert = true;
+        }
+        else
+        {
+            showAlert = false;
+            AtualizaFuncionarioDto funcionario = new AtualizaFuncionarioDto(nome, cpf, email, celular)
+                {
+                    Nome = nome,
+                    Cpf = cpf,
+                    Email = email,
+                    NumeroCelular = celular
+
+                };
+
+            await funcionariosApi.AtualizaFuncionarioAsync(Cpf!, funcionario);
+            navigationManager.NavigateTo("/Funcionarios");
+            
+        }
+    }
+}

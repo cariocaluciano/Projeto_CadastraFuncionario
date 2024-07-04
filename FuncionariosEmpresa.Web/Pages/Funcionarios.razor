@@ -1,0 +1,51 @@
+﻿@page "/Funcionarios"
+@inject FuncionariosApi funcionariosApi
+
+<MudStack Class="mt-4 mb-4" Row="true" Justify="Justify.SpaceBetween">
+    <MudText Class="mb-4" Typo="Typo.h4">Funcionários cadastrados</MudText>
+    <MudPagination Count="@totalPaginas" SelectedChanged="PaginaMudou"></MudPagination>
+</MudStack>
+
+@if (funcionariosPorPagina is not null)
+{
+    <MudGrid>
+        @foreach (var funcionario in funcionariosPorPagina)
+        {
+            <MudItem xs="3">
+                <CardFuncionario Funcionario="funcionario" />
+            </MudItem>
+        }
+    </MudGrid>
+}
+
+@code {
+    private ICollection<ExibeFuncionarioDto>? funcionarios;
+
+    private int tamanho = 8;
+    private int totalItens;
+    private int totalPaginas;
+    private ICollection<ExibeFuncionarioDto>? funcionariosPorPagina;
+
+    protected override async Task OnInitializedAsync()
+    {
+        funcionarios = await funcionariosApi.ExibeFuncionariosAsync();
+
+        if (funcionarios is not null)
+        {
+            funcionarios = funcionarios.OrderByDescending(a => a.Cpf).ToList();
+            totalItens = funcionarios.Count();
+            totalPaginas = Convert.ToInt32(Math.Ceiling((totalItens * 1.0) / tamanho));
+            this.PaginaMudou(1);
+        }
+
+    }
+
+    private void PaginaMudou(int pageNumber)
+    {
+        var indice = pageNumber - 1;
+        funcionariosPorPagina = funcionarios!
+            .Skip(tamanho * indice)
+            .Take(tamanho)
+            .ToList();
+    }
+}
